@@ -15,7 +15,7 @@ class MessagesPanel extends Component {
         return(
             <MessagesPanelWrap>
                 <MessagesHeader />
-                <div style={{height: '60%', backgroundColor: '#ccc'}}>
+                <div style={{marginTop: '1%', marginBottom: '1%', height: '72%', backgroundColor: '#ccc', overflowY: 'scroll', borderRadius: '10px'}}>
                     <h1>Messages</h1>
                 </div>
                 <MessageForm />

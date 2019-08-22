@@ -14,7 +14,7 @@ class MessagesPanel extends Component {
     render (){
         return(
             <MessagesPanelWrap>
-                <MessagesHeader />
+                <MessagesHeader {...this.props}/>
                 <div style={{marginTop: '1%', marginBottom: '1%', height: '72%', backgroundColor: '#ccc', overflowY: 'scroll', borderRadius: '10px'}}>
                     <h1>Messages</h1>
                 </div>

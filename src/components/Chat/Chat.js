@@ -19,8 +19,8 @@ class Chat extends Component {
                 return (
                     <Fragment>
                         <SidePanel {...this.props}/>
-                        <MessagesPanel />
-                        <DataPanel />
+                        <MessagesPanel {...this.props}/>
+                        <DataPanel {...this.props}/>
                         <div style={{ clear: 'both' }}></div>
                     </Fragment>
                 );

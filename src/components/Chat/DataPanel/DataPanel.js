@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {Button} from 'react-bootstrap';
 import styled from 'styled-components';
 
 const DataPanelWrap = styled.div`
@@ -9,13 +11,24 @@ const DataPanelWrap = styled.div`
 `
 
 class DataPanel extends Component {
+
+    dataPanelClick() {
+        console.log(this.props);
+    }
+
     render (){
         return(
             <DataPanelWrap>
-                <h1>Data Panel</h1>
+                <Button onClick={() => this.dataPanelClick()}>Click me</Button>
             </DataPanelWrap>
         );
     }
 }
 
-export default DataPanel;
+const mapStateToProps = (state) =>{
+    return {
+        channel: state.channel.currentChannel
+    }
+}
+
+export default connect(mapStateToProps, null)(DataPanel);

@@ -4,7 +4,6 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 
 const MessageFormWrap = styled.div`
     width: 60%;
-    border: 1px solid black;
     padding: 10px;
     min-height: 12%;
     height: 12%;
@@ -30,6 +29,7 @@ const MessageFormWrap = styled.div`
 
     .sendBtn:hover{
         background-color: #ff7733;
+        border-color: #ff9966;
     }
 `;
 

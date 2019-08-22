@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
 import { Form, FormControl, Button } from 'react-bootstrap';
+import Spinner from '../../../Spinner/Spinner';
 
 const Header = styled.div`
     width: 100%;
@@ -35,29 +37,46 @@ const Search = styled.div`
 `;
 class MessagesHeader extends Component {
     render() {
-        return (
-            <Fragment>
-                <Header>
-                    <ChannelName>
-                        <h2>Channel Name</h2>
-                        <div>
-                            <span><i className="fa fa-user"></i> Number of users</span>
-                        </div>
-                    </ChannelName>
-                    <Search>
-                        <div style={{ float: 'right' }}>
-                            <Form inline>
-                                <FormControl type="text" placeholder="&#xF002; Search" className="mr-sm-2" style={{fontFamily: 'Arial, FontAwesome'}}/>
-                                <Button variant="outline-info">Search</Button>
-                            </Form>
-                        </div>
-                        <div style={{clear: 'both'}}></div>
-                    </Search>
-                    <div style={{ clear: 'both' }}></div>
-                </Header>
-            </Fragment>
-        );
+        if (this.props.channel) {
+            return (
+                <Fragment>
+                    <Header>
+                        <ChannelName>
+                            <h2>{this.props.channel.channelName}</h2>
+                            <div>
+                                <span><i className="fa fa-user"></i> Number of users</span>
+                            </div>
+                        </ChannelName>
+                        <Search>
+                            <div style={{ float: 'right' }}>
+                                <Form inline>
+                                    <FormControl type="text" placeholder="&#xF002; Search" className="mr-sm-2" style={{ fontFamily: 'Arial, FontAwesome' }} />
+                                    <Button variant="outline-info">Search</Button>
+                                </Form>
+                            </div>
+                            <div style={{ clear: 'both' }}></div>
+                        </Search>
+                        <div style={{ clear: 'both' }}></div>
+                    </Header>
+                </Fragment>
+            );
+        }
+        else {
+            return (
+                <div>
+                    <Spinner />
+                    <h1>Loading messages...</h1>
+                </div>
+            );
+        }
+
     }
 }
 
-export default MessagesHeader;
+const mapStateToProps = (state) => {
+    return {
+        channel: state.channel.currentChannel
+    }
+}
+
+export default connect(mapStateToProps, null)(MessagesHeader);

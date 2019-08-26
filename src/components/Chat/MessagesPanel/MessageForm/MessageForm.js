@@ -1,6 +1,9 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import SockJsClient from 'react-stomp';
+import axiosMessages from '../../../../axios-messages';
 
 const MessageFormWrap = styled.div`
     width: 60%;
@@ -34,12 +37,14 @@ const MessageFormWrap = styled.div`
 `;
 
 const initialState = {
-    message: ''
+    messageContent: '',
+    messageEmptyError: false
 }
 class MessageForm extends Component {
 
     state = {
-        message: ''
+        messageContent: '',
+        messageEmptyError: false
     }
 
     inputChangedHandler = (event) => {
@@ -48,12 +53,36 @@ class MessageForm extends Component {
 
     sendMessage = (event) =>  {
         event.preventDefault();
-        console.log(this.state.message);
-        this.setState(initialState);
+
+        if(this.state.messageContent.length === 0){
+            this.setState({messageEmptyError: true});
+        }
+        else{
+            const message = {
+                channelId: this.props.channel.id,
+                messageContent: this.state.messageContent,
+                user: this.props.user
+            }
+    
+            const headers = {
+                "Authorization": `Bearer ${this.props.token}`
+            }
+    
+            axiosMessages.post("/add", message, {headers: headers}).then(response => {
+                console.log(response);
+            }).catch(error => {
+                console.log(error);
+            });
+    
+           // console.log(message);
+            //console.log(this.props);
+            this.setState(initialState);
+        }
+        
     }
 
     render() {
-        const { message } = this.state;
+        const { messageContent, messageEmptyError } = this.state;
 
         return (
             <Container>
@@ -62,7 +91,7 @@ class MessageForm extends Component {
                     <Form.Group>
                         <Row>
                             <Col lg="12">
-                                <Form.Control type="text" name="message" autoComplete="off" placeholder="Enter message" onChange={this.inputChangedHandler} value={message}/>
+                                <Form.Control style={{borderColor: messageEmptyError ? 'red' : null}} type="text" name="messageContent" autoComplete="off" placeholder="Enter message" onChange={this.inputChangedHandler} value={messageContent}/>
                             </Col>
                         </Row>
                         <Row>
@@ -75,10 +104,17 @@ class MessageForm extends Component {
                         </Row>
                     </Form.Group>
                     </Form>
+                    
                 </MessageFormWrap>
             </Container>
         );
     }
 }
 
-export default MessageForm;
+const mapStateToProps = (state) => {
+    return {
+        channel: state.channel.currentChannel
+    }
+};
+
+export default connect(mapStateToProps, null)(MessageForm);

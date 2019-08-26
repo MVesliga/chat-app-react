@@ -18,7 +18,7 @@ class MessagesPanel extends Component {
                 <div style={{marginTop: '1%', marginBottom: '1%', height: '72%', backgroundColor: '#ccc', overflowY: 'scroll', borderRadius: '10px'}}>
                     <h1>Messages</h1>
                 </div>
-                <MessageForm />
+                <MessageForm {...this.props}/>
             </MessagesPanelWrap>
         );
     }

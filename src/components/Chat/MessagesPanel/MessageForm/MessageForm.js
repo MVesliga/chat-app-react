@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import SockJsClient from 'react-stomp';
 import axiosMessages from '../../../../axios-messages';
@@ -74,8 +73,6 @@ class MessageForm extends Component {
                 console.log(error);
             });
     
-           // console.log(message);
-            //console.log(this.props);
             this.setState(initialState);
         }
         
@@ -111,10 +108,4 @@ class MessageForm extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        channel: state.channel.currentChannel
-    }
-};
-
-export default connect(mapStateToProps, null)(MessageForm);
+export default MessageForm;

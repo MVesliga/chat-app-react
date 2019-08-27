@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
 import { Form, FormControl, Button } from 'react-bootstrap';
 import Spinner from '../../../Spinner/Spinner';
 
@@ -36,13 +35,34 @@ const Search = styled.div`
     }
 `;
 class MessagesHeader extends Component {
+
+    state = {
+        channel: this.props.channel
+    }
+
+    componentWillReceiveProps(nextProps){
+        if(nextProps.channel.id !== this.state.channel.id){
+            this.setState({channel: nextProps.channel});
+        }
+    }
+
+    componentDidMount(){
+        //console.log(this.state);
+        this.props.currentChannelId(this.props.channel.id);
+    }
+
+    componentDidUpdate(){
+        //console.log(this.state);
+        this.props.currentChannelId(this.props.channel.id);
+    }
+
     render() {
-        if (this.props.channel) {
+        if (this.state.channel) {
             return (
                 <Fragment>
                     <Header>
                         <ChannelName>
-                            <h2>{this.props.channel.channelName}</h2>
+                            <h2>{this.state.channel.channelName}</h2>
                             <div>
                                 <span><i className="fa fa-user"></i> Number of users</span>
                             </div>
@@ -73,10 +93,4 @@ class MessagesHeader extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        channel: state.channel.currentChannel
-    }
-}
-
-export default connect(mapStateToProps, null)(MessagesHeader);
+export default MessagesHeader;

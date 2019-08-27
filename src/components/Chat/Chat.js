@@ -18,7 +18,7 @@ class Chat extends Component {
             if (this.props.user) {
                 return (
                     <Fragment>
-                        <SidePanel {...this.props}/>
+                        <SidePanel {...this.props} />
                         <MessagesPanel {...this.props}/>
                         <DataPanel {...this.props}/>
                         <div style={{ clear: 'both' }}></div>
@@ -50,7 +50,8 @@ const mapStateToProps = (state) => {
     return {
         token: state.auth.token,
         user: state.auth.user,
-        isAuthenticated: state.auth.token !== null
+        isAuthenticated: state.auth.token !== null,
+        channel: state.channel.currentChannel
     };
 };
 

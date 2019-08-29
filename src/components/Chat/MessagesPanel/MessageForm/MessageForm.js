@@ -66,7 +66,9 @@ class MessageForm extends Component {
             const headers = {
                 "Authorization": `Bearer ${this.props.token}`
             }
-    
+            
+            this.props.messageToAdd(message);
+
             axiosMessages.post("/add", message, {headers: headers}).then(response => {
                 console.log(response);
             }).catch(error => {

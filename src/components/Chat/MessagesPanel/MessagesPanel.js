@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-import IntervalRenderer from 'react-interval-renderer';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import MessagesHeader from './MessagesHeader/MessagesHeader';
 import MessageForm from './MessageForm/MessageForm';
@@ -7,6 +6,7 @@ import { connect } from 'react-redux';
 import Spinner from '../../Spinner/Spinner';
 import axiosMessages from '../../../axios-messages';
 import Message from './Message/Message';
+import SockJsClient from 'react-stomp';
 
 
 const MessagesPanelWrap = styled.div`
@@ -35,14 +35,14 @@ class MessagesPanel extends Component {
 
     getCurrentChannelId = (id) => {
         //console.log(id);
-        if(!this.state.isLoaded){
+        if (!this.state.isLoaded) {
             //console.log("postavljam id: " + id)
-            this.setState({currentChannelId: id, isLoaded: true});
+            this.setState({ currentChannelId: id, isLoaded: true });
         }
-        else{
-            if(id !== this.state.currentChannelId){
+        else {
+            if (id !== this.state.currentChannelId) {
                 //console.log("postavljam novi id: " + id);
-                this.setState({currentChannelId: id});
+                this.setState({ currentChannelId: id });
             }
         }
     }
@@ -53,49 +53,56 @@ class MessagesPanel extends Component {
         }));
     }
 
-    setChannelId(id){
-        this.setState({currentChannelId: id});
-    } 
+    setChannelId(id) {
+        this.setState({ currentChannelId: id });
+    }   
 
-    componentDidUpdate(prevProps, prevState){
+    axiosFunction = () => {
+        const headers = {
+            "Authorization": `Bearer ${this.props.token}`
+        }
+        axiosMessages.get("/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
+            this.setState({ messages: response.data });
+        }).catch(error => { 
+            console.log(error);
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
         //console.log(this.state);
 
-        if(prevState.currentChannelId !== this.state.currentChannelId){
-            const headers = {
-                "Authorization": `Bearer ${this.props.token}`
-            }
-            axiosMessages.get("/findAll/" + this.state.currentChannelId, {headers: headers}).then(response => {
-                this.setState({messages: response.data});
-            }).catch(error => {
-                console.log(error);
-            });
+        if (prevState.currentChannelId !== this.state.currentChannelId) {
+           this.axiosFunction();
+           this.interval = setInterval(this.axiosFunction, 1000);
         }
+    }
+
+    componentWillMount() {
+        clearInterval(this.interval);
     }
 
     displayMesages = (messages) => {
-        if(messages.length > 0){
-            return(
-            messages.map(message => (
-                <Message key={message.id} message={message} user={this.state.user}/>
-            )));
+        if (messages.length > 0) {
+            return (
+                messages.map(message => (
+                    <Message key={message.id} message={message} user={this.state.user} />
+                )));
         }
     }
 
-    render (){
-        const {messages} = this.state;
-        if(this.props.channel){
-            return(
+    render() {
+        const { messages } = this.state;
+        if (this.props.channel) {
+            return (
                 <MessagesPanelWrap>
                     <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} />
                     <MessagesWrap>
-                        <IntervalRenderer>
-                            <h1>{new Date().toLocaleTimeString()} </h1>
-                        </IntervalRenderer>
+                        {this.displayMesages(messages)}
                     </MessagesWrap>
-                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage}/>
+                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} />
                 </MessagesPanelWrap>
             );
-        }  
+        }
         else {
             return (
                 <div>
@@ -103,12 +110,12 @@ class MessagesPanel extends Component {
                     <h1>Loading messages...</h1>
                 </div>
             );
-        }      
+        }
     }
 }
 
 const mapStateToProps = (state) => {
-    return{
+    return {
         channel: state.channel.currentChannel
     };
 };

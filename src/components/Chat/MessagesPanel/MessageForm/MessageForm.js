@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { Form, Button, Container, Row, Col } from 'react-bootstrap';
-import SockJsClient from 'react-stomp';
 import axiosMessages from '../../../../axios-messages';
 
 const MessageFormWrap = styled.div`

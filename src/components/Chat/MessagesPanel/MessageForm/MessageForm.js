@@ -68,11 +68,11 @@ class MessageForm extends Component {
             
             this.props.messageToAdd(message);
 
-            axiosMessages.post("/add", message, {headers: headers}).then(response => {
-                console.log(response);
-            }).catch(error => {
-                console.log(error);
-            });
+            // axiosMessages.post("/add", message, {headers: headers}).then(response => {
+            //     console.log(response);
+            // }).catch(error => {
+            //     console.log(error);
+            // });
     
             this.setState(initialState);
         }

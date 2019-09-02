@@ -6,7 +6,9 @@ import { connect } from 'react-redux';
 import Spinner from '../../Spinner/Spinner';
 import axiosMessages from '../../../axios-messages';
 import Message from './Message/Message';
-import SockJsClient from 'react-stomp';
+import SockJS from 'sockjs-client';
+import * as Stomp from '@stomp/stompjs';
+import Channels from '../SidePanel/Channels/Channels';
 
 
 const MessagesPanelWrap = styled.div`
@@ -24,6 +26,8 @@ const MessagesWrap = styled.div`
     border-radius: 0px;
     padding: 10px;
 `;
+
+let stompClient;
 class MessagesPanel extends Component {
 
     state = {
@@ -48,14 +52,12 @@ class MessagesPanel extends Component {
     }
 
     addMessage = (message) => {
-        this.setState(oldState => ({
-            messages: [...oldState.messages, message]
-        }));
+        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
     }
 
     setChannelId(id) {
         this.setState({ currentChannelId: id });
-    }   
+    }
 
     axiosFunction = () => {
         const headers = {
@@ -63,17 +65,23 @@ class MessagesPanel extends Component {
         }
         axiosMessages.get("/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
             this.setState({ messages: response.data });
-        }).catch(error => { 
+        }).catch(error => {
             console.log(error);
         });
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        //console.log(this.state);
+    componentDidMount(){
+        let currentComponent = this;
+        
+        stompClient = this.props.stompClient;
 
+        console.log(stompClient);
+        
+    }
+
+    componentDidUpdate(prevProps, prevState) {
         if (prevState.currentChannelId !== this.state.currentChannelId) {
            this.axiosFunction();
-           this.interval = setInterval(this.axiosFunction, 1000);
         }
     }
 
@@ -116,7 +124,8 @@ class MessagesPanel extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        channel: state.channel.currentChannel
+        channel: state.channel.currentChannel,
+        mesages: state.messages
     };
 };
 

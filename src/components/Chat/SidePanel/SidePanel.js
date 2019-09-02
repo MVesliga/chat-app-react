@@ -12,16 +12,12 @@ const SidePanelWrap = styled.div`
 `
 
 class SidePanel extends Component {
-
-//    componentDidMount() {
-//        console.log(this.props);
-//    }
     render (){
         return(
             <SidePanelWrap>
                 <UserPanel {...this.props}/>
                 <hr />
-                <Channels {...this.props}/>
+                <Channels {...this.props} stompClient={this.props.stompClient}/>
             </SidePanelWrap>
         );
     }

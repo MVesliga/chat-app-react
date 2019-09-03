@@ -68,15 +68,20 @@ class MessagesPanel extends Component {
         }).catch(error => {
             console.log(error);
         });
-    }
+    }   
 
-    componentDidMount(){
-        let currentComponent = this;
-        
+    componentWillReceiveProps(nextProps){
+        if(nextProps.newMessage !== undefined){
+            this.setState(oldState => ({
+                messages: [...oldState.messages, nextProps.newMessage]
+            }));
+        }
+
+        this.props.resetMsg(true);
+    } 
+
+    componentDidMount(){        
         stompClient = this.props.stompClient;
-
-        console.log(stompClient);
-        
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -85,19 +90,25 @@ class MessagesPanel extends Component {
         }
     }
 
-    componentWillMount() {
-        clearInterval(this.interval);
-    }
+    // displayMesages = (messages) => {
+    //     if (messages.length > 0) {
+    //         return (
+    //             messages.map(message => (
+    //                 <Message key={message.id} message={message} user={this.state.user} />
+    //             )));
+    //     }
+    // }
 
     displayMesages = (messages) => {
-        if (messages.length > 0) {
-            return (
-                messages.map(message => (
-                    <Message key={message.id} message={message} user={this.state.user} />
-                )));
+        let returnMessage;
+        if(messages.length > 0){
+            returnMessage = messages.map((message,i) => {
+                return (message.channelId == this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
+            });
         }
-    }
 
+        return returnMessage;
+    }
     render() {
         const { messages } = this.state;
         if (this.props.channel) {

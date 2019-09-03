@@ -4,8 +4,6 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axiosChannels from '../../../../axios-channels';
 import { connect } from 'react-redux';
 import { setCurrentChannel } from '../../../../store/actions';
-import SockJS from 'sockjs-client';
-import * as Stomp from '@stomp/stompjs';
 
 const ChannelsWrap = styled.div`
     padding: 5%;
@@ -42,13 +40,9 @@ const ChannelDisplayItem = styled.div`
 `;
 
 const initialState = {
-    channels: [],
-    showModal: false,
     channelName: '',
     channelDescription: '',
-    addChannelError: '',
-    firstLoad: true,
-    activeChannel: ''
+    addChannelError: ''
 }
 
 
@@ -82,24 +76,28 @@ class Channels extends Component {
     componentDidMount() {
         this.getChannels();
 
-            let currentComponent = this;
-            stompClient = this.props.stompClient;
-        //     stompClient.subscribe("/topic/addChannel", function (channelResponse) {
-        //     let channelResponseObject = JSON.parse(channelResponse.body);
-        //     //console.log(channelResponseObject);
-        //     if (channelResponseObject.statusCode !== "BAD_REQUEST") {
-        //         let channel = channelResponseObject.body;
-        //         currentComponent.setState(oldState => ({
-        //             channels: [...oldState.channels, channel]
-        //         }));
-        //     }
-        //     else {
-        //         currentComponent.setState({ addChannelError: channelResponseObject.body });
-        //     }
-        // });
+        stompClient = this.props.stompClient;
     }
     
+    componentWillReceiveProps(nextProps){
+        console.log(nextProps);
 
+        if(nextProps.channelError !== ""){
+            this.setState({addChannelError: nextProps.channelError});
+        }
+
+        if(nextProps.channel !== undefined){
+            this.setState(oldState => ({
+                channels: [...oldState.channels, nextProps.channel],
+                addChannelError: "",
+                channelName: '',
+                channelDescription: '',
+                showModal: false
+            }));
+        }
+
+        //this.props.resetChnlError(true);
+    }
 
     setFirstChannel = () => {
         const firstChannel = this.state.channels[0];

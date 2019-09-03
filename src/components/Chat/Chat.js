@@ -10,49 +10,55 @@ import SockJS from 'sockjs-client';
 import * as Stomp from '@stomp/stompjs';
 
 class Chat extends Component {
-
-    constructor(props){
-        super(props);
-        this.messagesRef = React.createRef();
-        //this.channelsRef = React.createRef();
+    state = {
+        stompClient: '',
+        message: undefined,
+        channel: undefined,
+        channelError: ''
     }
 
-    state = {
-        stompClient: ''
+    resetMessage = (flag) => {
+        if(flag){
+            this.setState({message: undefined});
+        }
+    }
+
+    resetChannelError = (flag) => {
+        if(flag){
+            this.setState({channelError: ''})
+        }
     }
 
     componentDidMount(){
         let ws = new SockJS("http://localhost:8080/ws");
         let stompClient = Stomp.Stomp.over(ws);
-        
-        console.log(this.messagesRef);
 
-        stompClient.connect({}, function(frame){
-            stompClient.subscribe("/topic/public", function(message){
-                console.log(JSON.parse(message.body));
-                // currentComponent.setState(oldState => ({
-                //         messages: [...oldState.messages, JSON.parse(message.body)]
-                //     }));
+        stompClient.connect({}, (frame) => {
+           stompClient.subscribe("/topic/sendMessage", (message) => {
+                this.setState({message: JSON.parse(message.body)});
             });
 
-            stompClient.subscribe("/topic/addChannel", function (channelResponse) {
+        stompClient.subscribe("/topic/addChannel", (channelResponse) => {
                 let channelResponseObject = JSON.parse(channelResponse.body);
-                console.log(channelResponseObject);
-                // if (channelResponseObject.statusCode !== "BAD_REQUEST") {
-                //     let channel = channelResponseObject.body;
-                //     channelComponent.setState(oldState => ({
-                //         channels: [...oldState.channels, channel]
-                //     }));
-                // }
-                // else {
-                //     currentComponent.setState({ addChannelError: channelResponseObject.body });
-                // }
+
+                if(channelResponseObject.statusCode !== "BAD_REQUEST"){
+                    let channel = channelResponseObject.body;
+                    this.setState({channel: channel});
+                }
+                else{
+                    this.setState({channelError: channelResponseObject.body});
+                }
             });
-        }, function(error){
-            console.log("STOMP protocol error " + error);
+        }, (error) => {
+            console.log("STOMP protocol error " + error)
         });
 
         this.setState({stompClient: stompClient})
+    }
+
+    componentWillUnmount(){
+       this.state.stompClient.unsubscribe('sub-0');
+       this.state.stompClient.unsubscribe('sub-1');
     }
 
     render() {
@@ -60,8 +66,8 @@ class Chat extends Component {
             if (this.props.user && this.state.stompClient) {
                 return (
                     <Fragment>
-                        <SidePanel ref={this.channelsRef} {...this.props} stompClient={this.state.stompClient}/>
-                        <MessagesPanel ref={this.messagesRef} {...this.props} stompClient={this.state.stompClient}/>
+                        <SidePanel {...this.props} stompClient={this.state.stompClient} channel={this.state.channel} channelError={this.state.channelError} resetChnlError={this.resetChannelError}/>
+                        <MessagesPanel {...this.props} stompClient={this.state.stompClient} newMessage={this.state.message} resetMsg={this.resetMessage}/>
                         <DataPanel {...this.props}/>
                         <div style={{ clear: 'both' }}></div>
                     </Fragment>

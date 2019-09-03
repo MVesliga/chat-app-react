@@ -12,12 +12,19 @@ const SidePanelWrap = styled.div`
 `
 
 class SidePanel extends Component {
+
+    resetChannelError = (flag) => {
+        if(flag){
+            this.props.resetChnlError(true);
+        }
+    }
+
     render (){
         return(
             <SidePanelWrap>
                 <UserPanel {...this.props}/>
                 <hr />
-                <Channels {...this.props} stompClient={this.props.stompClient}/>
+                <Channels {...this.props} stompClient={this.props.stompClient} channel={this.props.channel} channelError={this.props.channelError} resetChnlError={this.resetChannelError}/>
             </SidePanelWrap>
         );
     }

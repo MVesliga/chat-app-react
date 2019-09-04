@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import axiosMessages from '../../../../axios-messages';
 
 const MessageFormWrap = styled.div`
@@ -36,13 +36,16 @@ const MessageFormWrap = styled.div`
 
 const initialState = {
     messageContent: '',
-    messageEmptyError: false
+    messageEmptyError: false,
+    showModal: false
 }
+
 class MessageForm extends Component {
 
     state = {
         messageContent: '',
-        messageEmptyError: false
+        messageEmptyError: false,
+        showModal: false
     }
 
     inputChangedHandler = (event) => {
@@ -79,6 +82,18 @@ class MessageForm extends Component {
         
     }
 
+    showModal() {
+        this.setState({ showModal: true });
+    }
+
+    closeModal() {
+        this.setState({ showModal: false });
+    }   
+
+    fileSelectedHandler = event => {
+        console.log(event.target.files[0]);
+    }
+
     render() {
         const { messageContent, messageEmptyError } = this.state;
 
@@ -97,12 +112,27 @@ class MessageForm extends Component {
                                 <Button type="submit" className="sendBtn">Send</Button>
                             </Col>
                             <Col lg="6">
-                                <Button variant="info">Upload files</Button>
+                                <Button variant="info" onClick={() => this.showModal()}>Upload picture</Button>
                             </Col>
                         </Row>
                     </Form.Group>
                     </Form>
                     
+                    <Modal show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add Picture</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group >
+                            <Form.Label><b>Select file</b></Form.Label>
+                            <Form.Control type="file" onChange={this.fileSelectedHandler}/>
+                        </Form.Group>  
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={() => this.closeModal()}>Save</Button>
+                        <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
+                    </Modal.Footer>
+                </Modal>
                 </MessageFormWrap>
             </Container>
         );

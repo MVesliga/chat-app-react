@@ -19,10 +19,16 @@ class SidePanel extends Component {
         }
     }
 
+    showUserData = (flag) => {
+        if(flag){
+            this.props.showUsrData(true);
+        }
+    }
+
     render (){
         return(
             <SidePanelWrap>
-                <UserPanel {...this.props}/>
+                <UserPanel {...this.props} showUsrData={this.showUserData}/>
                 <hr />
                 <Channels {...this.props} stompClient={this.props.stompClient} channel={this.props.channel} channelError={this.props.channelError} resetChnlError={this.resetChannelError}/>
             </SidePanelWrap>

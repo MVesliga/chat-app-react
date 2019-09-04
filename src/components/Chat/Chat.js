@@ -14,7 +14,8 @@ class Chat extends Component {
         stompClient: '',
         message: undefined,
         channel: undefined,
-        channelError: ''
+        channelError: '',
+        showUserData: false
     }
 
     resetMessage = (flag) => {
@@ -26,6 +27,18 @@ class Chat extends Component {
     resetChannelError = (flag) => {
         if(flag){
             this.setState({channelError: ''})
+        }
+    }
+
+    showUserData = (flag) => {
+        if(flag){
+            this.setState({showUserData: true});
+        }
+    }
+
+    resetShowUserData = (flag) => {
+        if(flag){
+            this.setState({showUserData: false});
         }
     }
 
@@ -66,9 +79,9 @@ class Chat extends Component {
             if (this.props.user && this.state.stompClient) {
                 return (
                     <Fragment>
-                        <SidePanel {...this.props} stompClient={this.state.stompClient} channel={this.state.channel} channelError={this.state.channelError} resetChnlError={this.resetChannelError}/>
+                        <SidePanel {...this.props} stompClient={this.state.stompClient} channel={this.state.channel} channelError={this.state.channelError} resetChnlError={this.resetChannelError} showUsrData={this.showUserData}/>
                         <MessagesPanel {...this.props} stompClient={this.state.stompClient} newMessage={this.state.message} resetMsg={this.resetMessage}/>
-                        <DataPanel {...this.props}/>
+                        <DataPanel {...this.props} showUserData={this.state.showUserData} resetShowUsrData={this.resetShowUserData}/>
                         <div style={{ clear: 'both' }}></div>
                     </Fragment>
                 );

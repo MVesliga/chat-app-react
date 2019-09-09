@@ -33,7 +33,7 @@ class SidePanel extends Component {
                 <hr />
                 <Channels {...this.props} stompClient={this.props.stompClient} channel={this.props.channel} channelError={this.props.channelError} resetChnlError={this.resetChannelError}/>
                 <br /><br />
-                <DirectMessages />
+                <DirectMessages {...this.props} />
             </SidePanelWrap>
         );
     }

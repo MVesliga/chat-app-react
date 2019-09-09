@@ -69,7 +69,6 @@ class Channels extends Component {
             loadedChannels.push(...response.data);
             this.setState({ channels: loadedChannels });
             this.setFirstChannel();
-            //console.log(this.state);
         }).catch(error => console.log(error));
     }
 
@@ -116,7 +115,8 @@ class Channels extends Component {
         channels.map(channel => (
             <ChannelDisplayItem
                 id="channelDisplayItem"
-                key={channel.channelName} onClick={() => this.changeChannel(channel)}
+                key={channel.channelName} 
+                onClick={() => this.changeChannel(channel)}
                 name={channel.channelName}
                 style={{ backgroundColor: channel.channelName === this.state.activeChannel ? '#ff7733' : null }}>{channel.channelName}</ChannelDisplayItem>
         ))

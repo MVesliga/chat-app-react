@@ -37,7 +37,8 @@ const Search = styled.div`
 class MessagesHeader extends Component {
 
     state = {
-        channel: this.props.channel
+        channel: this.props.channel,
+        searchString: ''
     }
 
     componentWillReceiveProps(nextProps){
@@ -56,7 +57,17 @@ class MessagesHeader extends Component {
         this.props.currentChannelId(this.props.channel.id);
     }
 
+    searchMessages = (event) => {
+        event.preventDefault();
+        this.props.searchMessages(this.state.searchString);
+    }
+
+    inputChangedHandler = (event) => {
+        this.setState({ [event.target.name]: event.target.value });
+    };
+
     render() {
+        const {searchString} = this.state;
         if (this.state.channel) {
             return (
                 <Fragment>
@@ -69,9 +80,9 @@ class MessagesHeader extends Component {
                         </ChannelName>
                         <Search>
                             <div style={{ float: 'right' }}>
-                                <Form inline>
-                                    <FormControl type="text" placeholder="&#xF002; Search" className="mr-sm-2" style={{ fontFamily: 'Arial, FontAwesome' }} />
-                                    <Button variant="outline-info">Search</Button>
+                                <Form inline onSubmit={this.searchMessages}>
+                                    <FormControl type="text" autoComplete="off" name="searchString" placeholder="&#xF002; Search" className="mr-sm-2" style={{ fontFamily: 'Arial, FontAwesome' }} onChange={this.inputChangedHandler} value={searchString} />
+                                    <Button type="submit" variant="outline-info">Search</Button>
                                 </Form>
                             </div>
                             <div style={{ clear: 'both' }}></div>

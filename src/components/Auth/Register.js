@@ -61,22 +61,22 @@ const RegistrationErrorMessage = styled.div`
     margin-bottom: 20px;
 `;
 
-const initialState = {
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-    firstNameError: '',
-    lastNameError: '',
-    usernameError: '',
-    emailError: '',
-    passwordError: '',
-    passwordConfirmationError: '',
-    registrationError: '',
-    registered: false
-}
+// const initialState = {
+//     firstName: '',
+//     lastName: '',
+//     username: '',
+//     email: '',
+//     password: '',
+//     passwordConfirmation: '',
+//     firstNameError: '',
+//     lastNameError: '',
+//     usernameError: '',
+//     emailError: '',
+//     passwordError: '',
+//     passwordConfirmationError: '',
+//     registrationError: '',
+//     registered: false
+// }
 
 class Register extends Component {
 
@@ -167,7 +167,7 @@ class Register extends Component {
                 password: this.state.password, 
                 imgUrl: `http://gravatar.com/avatar/${md5(this.state.email)}?d=identicon`
             }
-
+            
             axiosAuth.post('/register', user).then(response => {
                 console.log(response);
                 //this.props.history.push('/login');

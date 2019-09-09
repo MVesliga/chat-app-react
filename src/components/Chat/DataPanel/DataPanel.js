@@ -4,6 +4,7 @@ import { Button, Accordion, Card, Modal, Form } from 'react-bootstrap';
 import styled from 'styled-components';
 import Moment from 'react-moment';
 import Spinner from '../../Spinner/Spinner';
+import axiosUsers from '../../../axios-users';
 
 const DataPanelWrap = styled.div`
     height: 100vh;
@@ -58,6 +59,12 @@ const ImageData = styled.div`
     float: right;
     padding: 15px;
 `
+
+// const initialState = {
+//     showModal: false,
+//     newImage: '',
+//     imageUploaded: false
+// }
 class DataPanel extends Component {
 
     state = {
@@ -65,7 +72,9 @@ class DataPanel extends Component {
         accordionOpen: false,
         showUserData: false,
         user: this.props.user,
-        showModal: false
+        showModal: false,
+        newImage: '',
+        imageUploaded: false
     }
 
     componentWillReceiveProps(nextProps) {
@@ -88,7 +97,13 @@ class DataPanel extends Component {
     }
 
     closeModal() {
-        this.setState({ showModal: false });
+        //postavi usera na this.props.user
+        this.setState({
+            user: this.props.user,
+            newImage: '',
+            imageUploaded: false,
+            showModal: false
+        });
     }
 
     inputChangedHandler = (event) => {
@@ -96,6 +111,42 @@ class DataPanel extends Component {
         userCopy[event.target.name] = event.target.value;
         this.setState({user: userCopy});
     };
+
+    handleImageChange = (event) => {
+        const image = event.target.files[0];
+        const reader = new FileReader();
+
+        if(image){
+            reader.readAsDataURL(image);
+            reader.addEventListener('load', () => {
+                this.setState({
+                    imageUploaded: true, 
+                    newImage: reader.result});
+            })
+        }
+        // this.setState({
+        //     imageUploaded: true,
+        //     ///newImage: URL.createObjectURL(event.target.files[0])
+        //     newImage: event.target.files[0]
+        // });
+    }
+
+    updateUser = () => {
+        let updatedUser = this.state.user;
+        if(this.state.imageUploaded){
+            updatedUser.imgUrl = this.state.newImage;
+        }
+
+        const headers = {
+            "Authorization": `Bearer ${this.props.token}`
+        }
+        axiosUsers.put("/updateUser", updatedUser, {headers: headers}).then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 
     render() {
         if (this.state.currentChannel) {
@@ -106,10 +157,9 @@ class DataPanel extends Component {
                             <h2>User data</h2>
                         </UserDataHeader>
                         <hr />
-                        <img src={this.state.user.imgUrl} alt="avatar" />
+                        <img src={this.state.user.imgUrl} alt="avatar" height="100px"/>
                         <br /><br />
                         <div>
-                            <Button style={{ marginRight: '10px' }}>Message</Button>
                             <Button onClick={this.showModal}>Edit Profile</Button>
                         </div>
                         <hr />
@@ -148,14 +198,14 @@ class DataPanel extends Component {
                                         </Form.Group>
                                     </TextData>
                                     <ImageData>
-                                        <img src={this.state.user.imgUrl} alt="avatar" />
-                                        <input type="file" />
+                                        <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px"/> <br /><br />
+                                        <input type="file" onChange={this.handleImageChange}/>
                                     </ImageData>
                                     <div style={{clear: 'both'}}></div>
                                 </Form>
                             </Modal.Body>
                             <Modal.Footer>
-                                <Button variant="primary" onClick={() => console.log(this.state.user)}>Save</Button>
+                                <Button variant="primary" onClick={() => this.updateUser()}>Save</Button>
                                 <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
                             </Modal.Footer>
                         </Modal>

@@ -6,10 +6,6 @@ import { connect } from 'react-redux';
 import Spinner from '../../Spinner/Spinner';
 import axiosMessages from '../../../axios-messages';
 import Message from './Message/Message';
-import SockJS from 'sockjs-client';
-import * as Stomp from '@stomp/stompjs';
-import Channels from '../SidePanel/Channels/Channels';
-
 
 const MessagesPanelWrap = styled.div`
     height: 100vh;
@@ -34,7 +30,9 @@ class MessagesPanel extends Component {
         currentChannelId: undefined,
         user: this.props.user,
         messages: [],
-        isLoaded: false
+        isLoaded: false,
+        searchString: '',
+        searchResult: []
     }
 
     getCurrentChannelId = (id) => {
@@ -53,6 +51,25 @@ class MessagesPanel extends Component {
 
     addMessage = (message) => {
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
+    }
+
+    searchMessages = (searchString) => {
+        this.setState({searchString: searchString});
+        
+        const messages = [...this.state.messages];
+        // const searchResult = messages.reduce((acc, message) => {
+        //     if(message.messageContent.match(searchString)) {
+        //         acc.push(message);
+        //     }
+        //     return acc;
+        // }, []);
+        const searchResult = messages.filter(message => {
+            return message.messageContent.match(searchString);
+        });
+        
+        this.setState({searchResult: searchResult});
+
+        console.log(this.state.searchResult);
     }
 
     setChannelId(id) {
@@ -90,33 +107,24 @@ class MessagesPanel extends Component {
         }
     }
 
-    // displayMesages = (messages) => {
-    //     if (messages.length > 0) {
-    //         return (
-    //             messages.map(message => (
-    //                 <Message key={message.id} message={message} user={this.state.user} />
-    //             )));
-    //     }
-    // }
-
-    displayMesages = (messages) => {
+    displayMessages = (messages) => {
         let returnMessage;
         if(messages.length > 0){
             returnMessage = messages.map((message,i) => {
-                return (message.channelId == this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
+                return (message.channelId === this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
             });
         }
 
         return returnMessage;
     }
     render() {
-        const { messages } = this.state;
+        const { messages, searchResult } = this.state;
         if (this.props.channel) {
             return (
                 <MessagesPanelWrap>
-                    <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} />
+                    <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} searchMessages={this.searchMessages}/>
                     <MessagesWrap>
-                        {this.displayMesages(messages)}
+                        {this.state.searchString ? this.displayMessages(searchResult) : this.displayMessages(messages)}
                     </MessagesWrap>
                     <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} />
                 </MessagesPanelWrap>

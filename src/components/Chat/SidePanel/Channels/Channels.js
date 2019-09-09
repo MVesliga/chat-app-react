@@ -80,7 +80,7 @@ class Channels extends Component {
     }
     
     componentWillReceiveProps(nextProps){
-        console.log(nextProps);
+        //console.log(nextProps);
 
         if(nextProps.channelError !== ""){
             this.setState({addChannelError: nextProps.channelError});

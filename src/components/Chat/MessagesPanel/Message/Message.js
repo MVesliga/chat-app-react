@@ -30,6 +30,11 @@ const MessageWrap = styled.div`
         font-weight: bold;
         font-size: 18px;
     }
+
+    .msgDetails a:hover{
+        text-decoration: underline !important;
+        cursor: pointer;
+    }
 `;
 
 //const timeFromNow = (timestamp) => moment(timestamp).fromNow();
@@ -39,7 +44,7 @@ const Message = (props) => (
         <MessageWrap>
             <img className="usrImg" src={props.message.user.imgUrl} alt="userImage" height="50px;" />
             <div className="msgDetails">
-                <span><Link to="/chat">{props.message.user.username}</Link> <Moment style={{ fontSize: '12px' }} fromNow>{props.message.timestamp}</Moment></span>
+                <span><a href="#">{props.message.user.username}</a> <Moment style={{ fontSize: '12px' }} fromNow>{props.message.timestamp}</Moment></span>
                 <p>{props.message.messageContent}</p>
             </div>
             <div style={{ clear: 'both' }}></div>

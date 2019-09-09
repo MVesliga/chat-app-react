@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import styled from 'styled-components';
 import UserPanel from './UserPanel/UserPanel';
 import Channels from './Channels/Channels';
+import DirectMessages from './DirectMessages/DirectMessages';
 
 const SidePanelWrap = styled.div`
     height: 100vh;
@@ -31,6 +32,8 @@ class SidePanel extends Component {
                 <UserPanel {...this.props} showUsrData={this.showUserData}/>
                 <hr />
                 <Channels {...this.props} stompClient={this.props.stompClient} channel={this.props.channel} channelError={this.props.channelError} resetChnlError={this.resetChannelError}/>
+                <br /><br />
+                <DirectMessages />
             </SidePanelWrap>
         );
     }

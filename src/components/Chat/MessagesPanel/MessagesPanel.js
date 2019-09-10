@@ -50,19 +50,20 @@ class MessagesPanel extends Component {
     }
 
     addMessage = (message) => {
-        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
+        if(this.props.isPrivateChannel){
+            stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message));
+        }
+        else {
+            stompClient.send("/app/chat.sendMessage",  {}, JSON.stringify(message));
+        }
+        
     }
-
+    
     searchMessages = (searchString) => {
         this.setState({searchString: searchString});
         
         const messages = [...this.state.messages];
-        // const searchResult = messages.reduce((acc, message) => {
-        //     if(message.messageContent.match(searchString)) {
-        //         acc.push(message);
-        //     }
-        //     return acc;
-        // }, []);
+
         const searchResult = messages.filter(message => {
             return message.messageContent.match(searchString);
         });
@@ -80,11 +81,22 @@ class MessagesPanel extends Component {
         const headers = {
             "Authorization": `Bearer ${this.props.token}`
         }
-        axiosMessages.get("/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
-            this.setState({ messages: response.data });
-        }).catch(error => {
-            console.log(error);
-        });
+
+        if(this.props.isPrivateChannel){
+            axiosMessages.get("/privateMessages/findAll/" + this.state.user.username + "/" + this.props.channel.channelName, {headers: headers}).then(response => {
+                this.setState({messages: response.data});
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+        else{
+            axiosMessages.get("/messages/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
+                this.setState({ messages: response.data });
+            }).catch(error => {
+                console.log(error);
+            });
+        }
     }   
 
     componentWillReceiveProps(nextProps){
@@ -102,17 +114,27 @@ class MessagesPanel extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        //console.log(this.props);
         if (prevState.currentChannelId !== this.state.currentChannelId) {
-           this.axiosFunction();
+                this.axiosFunction();
         }
     }
 
     displayMessages = (messages) => {
         let returnMessage;
+        
         if(messages.length > 0){
-            returnMessage = messages.map((message,i) => {
-                return (message.channelId === this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
-            });
+            if(this.props.isPrivateChannel){
+                returnMessage = messages.map((message, i) => {
+                    return (message.from === this.state.user.username && message.to === this.props.channel.channelName) ? <p>{message.messageContent}</p> : null
+                });
+            }
+            else{
+                returnMessage = messages.map((message,i) => {
+                    return (message.channelId === this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
+                });
+            }
+            
         }
 
         return returnMessage;
@@ -126,7 +148,7 @@ class MessagesPanel extends Component {
                     <MessagesWrap>
                         {this.state.searchString ? this.displayMessages(searchResult) : this.displayMessages(messages)}
                     </MessagesWrap>
-                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} />
+                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} isPrivateChannel={this.props.isPrivateChannel}/>
                 </MessagesPanelWrap>
             );
         }

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
 import axiosUsers from '../../../../axios-users';
+import { connect } from 'react-redux';
+import { setCurrentChannel, setPrivateChannel } from '../../../../store/actions';
 
 const DirectMessagesWrap = styled.div`
     padding: 5%;
@@ -47,8 +49,25 @@ class DirectMessages extends Component {
         })
     }  
 
-    changeUserMessage = (user) => {
+    changeUserMessageChannel = (user) => {
         this.setState({activeUser: user.username});
+
+        const userMessageChannelId = this.getUserMessageChannelId(user.id);
+
+        const channelData = {
+            id: userMessageChannelId,
+            channelName: user.username
+        }
+
+        this.props.setCurrentChannel(channelData);
+        this.props.setPrivateChannel(true);
+        
+    }
+
+    getUserMessageChannelId = (userId) => {
+        const currentUserId = this.props.user.id;
+
+        return userId < currentUserId ? `${userId}/${currentUserId}` : `${currentUserId}/${userId}`;
     }
 
     displayUsers = (users) => (
@@ -56,13 +75,14 @@ class DirectMessages extends Component {
             <UserDisplayItem 
             id="userDisplayItem" 
             key={user.id}
-             onClick={() => this.changeUserMessage(user)} 
-             name={user.username}
-             style={{ backgroundColor: user.username === this.state.activeUser ? '#ff7733' : null }}>{user.firstName} {user.lastName}</UserDisplayItem>
+            onClick={() => this.changeUserMessageChannel(user)} 
+            name={user.username}
+            style={{ backgroundColor: user.username === this.state.activeUser ? '#ff7733' : null }}>{user.firstName} {user.lastName}</UserDisplayItem>
         ))
     );
 
     componentDidMount(){
+        //console.log(this.props);
         this.getUsers();
     }
 
@@ -78,4 +98,4 @@ class DirectMessages extends Component {
     }
 }
 
-export default DirectMessages;
+export default connect(null, {setCurrentChannel, setPrivateChannel})(DirectMessages);

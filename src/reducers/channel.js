@@ -2,7 +2,8 @@ import * as actionTypes from '../store/actions/actionTypes';
 import { updateObject } from '../utility';
 
 const initialChannelState = {
-    currentChannel: null
+    currentChannel: null,
+    isPrivateChannel: false
 }
 
 const setCurrentChannel = (state, action) => {
@@ -11,10 +12,18 @@ const setCurrentChannel = (state, action) => {
     })
 }
 
+const setPrivateChannel = (state, action) => {
+    return updateObject(state, {
+        isPrivateChannel: action.isPrivateChannel
+    })
+}
+
 const channelReducer = (state = initialChannelState, action) => {
     switch (action.type) {
         case actionTypes.SET_CURRENT_CHANNEL:
             return setCurrentChannel(state, action);
+        case actionTypes.SET_PRIVATE_CHANNEL:
+            return setPrivateChannel(state, action);
         default:
             return state;
     }

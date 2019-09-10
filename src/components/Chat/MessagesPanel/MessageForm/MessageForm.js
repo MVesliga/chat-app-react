@@ -52,29 +52,37 @@ class MessageForm extends Component {
         this.setState({ [event.target.name]: event.target.value });
     };
 
-    sendMessage = (event) =>  {
+    sendMessage = (event) => {
         event.preventDefault();
 
-        if(this.state.messageContent.length === 0){
-            this.setState({messageEmptyError: true});
+        if (this.state.messageContent.length === 0) {
+            this.setState({ messageEmptyError: true });
         }
-        else{
-            const message = {
-                channelId: this.props.channel.id,
-                messageContent: this.state.messageContent,
-                user: this.props.user
+        else {
+            if (this.props.isPrivateChannel) {
+                const privateMessage = {
+                    from: this.props.user.username,
+                    to: this.props.channel.channelName,
+                    messageContent: this.state.messageContent
+                }
+
+                this.props.messageToAdd(privateMessage);
             }
-    
-            const headers = {
-                "Authorization": `Bearer ${this.props.token}`
+            else {
+                const message = {
+                    channelId: this.props.channel.id,
+                    messageContent: this.state.messageContent,
+                    user: this.props.user
+                }
+
+                //console.log(message);
+                this.props.messageToAdd(message);
+
             }
-            
-            //console.log(message);
-            this.props.messageToAdd(message);
-    
+
             this.setState(initialState);
         }
-        
+
     }
 
     showModal() {
@@ -83,7 +91,7 @@ class MessageForm extends Component {
 
     closeModal() {
         this.setState({ showModal: false });
-    }   
+    }
 
     fileSelectedHandler = event => {
         console.log(event.target.files[0]);
@@ -96,38 +104,38 @@ class MessageForm extends Component {
             <Container>
                 <MessageFormWrap>
                     <Form onSubmit={this.sendMessage}>
-                    <Form.Group>
-                        <Row>
-                            <Col lg="12">
-                                <Form.Control style={{borderColor: messageEmptyError ? 'red' : null}} type="text" name="messageContent" autoComplete="off" placeholder="Enter message" onChange={this.inputChangedHandler} value={messageContent}/>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col lg="6">
-                                <Button type="submit" className="sendBtn">Send</Button>
-                            </Col>
-                            <Col lg="6">
-                                <Button variant="info" onClick={() => this.showModal()}>Upload picture</Button>
-                            </Col>
-                        </Row>
-                    </Form.Group>
+                        <Form.Group>
+                            <Row>
+                                <Col lg="12">
+                                    <Form.Control style={{ borderColor: messageEmptyError ? 'red' : null }} type="text" name="messageContent" autoComplete="off" placeholder="Enter message" onChange={this.inputChangedHandler} value={messageContent} />
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col lg="6">
+                                    <Button type="submit" className="sendBtn">Send</Button>
+                                </Col>
+                                <Col lg="6">
+                                    <Button variant="info" onClick={() => this.showModal()}>Upload picture</Button>
+                                </Col>
+                            </Row>
+                        </Form.Group>
                     </Form>
-                    
+
                     <Modal show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Add Picture</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form.Group >
-                            <Form.Label><b>Select file</b></Form.Label>
-                            <Form.Control type="file" onChange={this.fileSelectedHandler}/>
-                        </Form.Group>  
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="primary" onClick={() => this.closeModal()}>Save</Button>
-                        <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
-                    </Modal.Footer>
-                </Modal>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Add Picture</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Group >
+                                <Form.Label><b>Select file</b></Form.Label>
+                                <Form.Control type="file" onChange={this.fileSelectedHandler} />
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={() => this.closeModal()}>Save</Button>
+                            <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
+                        </Modal.Footer>
+                    </Modal>
                 </MessageFormWrap>
             </Container>
         );

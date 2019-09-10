@@ -74,13 +74,15 @@ class DataPanel extends Component {
         user: this.props.user,
         showModal: false,
         newImage: '',
-        imageUploaded: false
+        imageUploaded: false,
+        isPrivateChannel: this.props.isPrivateChannel
     }
 
     componentWillReceiveProps(nextProps) {
         //console.log(nextProps);
         this.setState({ currentChannel: nextProps.channel });
         this.setState({ showUserData: nextProps.showUserData });
+        this.setState({isPrivateChannel: nextProps.isPrivateChannel});
     }
 
     toggleAccordion = () => {
@@ -150,103 +152,111 @@ class DataPanel extends Component {
 
     render() {
         if (this.state.currentChannel) {
-            if (this.state.showUserData) {
+            if(this.state.isPrivateChannel){
                 return (
-                    <UserDataWrap>
-                        <UserDataHeader>
-                            <h2>User data</h2>
-                        </UserDataHeader>
-                        <hr />
-                        <img src={this.state.user.imgUrl} alt="avatar" height="100px"/>
-                        <br /><br />
-                        <div>
-                            <Button onClick={this.showModal}>Edit Profile</Button>
-                        </div>
-                        <hr />
-                        <div className="usrData">
-                            <p className="usrDataHeader">Full Name</p>
-                            <p>{this.state.user.firstName} {this.state.user.lastName}</p>
-                            <hr />
-                            <p className="usrDataHeader">Email</p>
-                            <p>{this.state.user.email}</p>
-                        </div>
-                        <br /><br />
-                        <Button variant="danger" onClick={this.resetUserData}>close</Button>
-
-                        <Modal style={{ zIndex: '200px' }} show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
-                            <Modal.Header closeButton>
-                                <Modal.Title>Edit your Profile</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body style={{ textAlign: 'center' }}>
-                                <Form>
-                                    <TextData>
-                                        <Form.Group >
-                                            <Form.Label>First name</Form.Label>
-                                            <Form.Control type="text" name="firstName" onChange={this.inputChangedHandler} placeholder="Enter your first name" value={this.state.user.firstName} />
-                                        </Form.Group>
-                                        <Form.Group >
-                                            <Form.Label>Last name</Form.Label>
-                                            <Form.Control type="text" name="lastName" onChange={this.inputChangedHandler} placeholder="Enter your last name" value={this.state.user.lastName} />
-                                        </Form.Group>
-                                        <Form.Group >
-                                            <Form.Label>Username</Form.Label>
-                                            <Form.Control type="text" name="username" onChange={this.inputChangedHandler} placeholder="Enter username" value={this.state.user.username} />
-                                        </Form.Group>
-                                        <Form.Group >
-                                            <Form.Label>Email</Form.Label>
-                                            <Form.Control type="text" name="email" onChange={this.inputChangedHandler} placeholder="Enter your email" value={this.state.user.email} />
-                                        </Form.Group>
-                                    </TextData>
-                                    <ImageData>
-                                        <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px"/> <br /><br />
-                                        <input type="file" onChange={this.handleImageChange}/>
-                                    </ImageData>
-                                    <div style={{clear: 'both'}}></div>
-                                </Form>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="primary" onClick={() => this.updateUser()}>Save</Button>
-                                <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
-                            </Modal.Footer>
-                        </Modal>
-                    </UserDataWrap>
+                    <h1>private channel</h1>
                 )
             }
-            else {
-                return (
-                    <DataPanelWrap>
-                        <DataPanelHeader>
-                            <h2>About this channel</h2>
-                        </DataPanelHeader>
-                        <Accordion>
-                            <Card>
-                                <Accordion.Toggle as={Card.Header} eventKey="0" onClick={this.toggleAccordion}>
-                                    <span><i className="fa fa-info-circle"></i> Channel Details </span><i style={{ paddingLeft: '56%' }} className={this.state.accordionOpen ? "fa fa-chevron-down" : "fa fa-chevron-right"}></i>
-                                </Accordion.Toggle>
-                                <Accordion.Collapse eventKey="0">
-                                    <Card.Body>
-                                        <p className="channelDetailsHeader">Channel name</p>
-                                        <p>{this.state.currentChannel.channelName}</p>
-                                        <hr />
-                                        <p className="channelDetailsHeader">Channel description</p>
-                                        <p>{this.state.currentChannel.channelDescription}</p>
-                                        <hr />
-                                        <p className="channelDetailsHeader">Created</p>
-                                        <p>Created by {this.state.currentChannel.createdBy.firstName} {this.state.currentChannel.createdBy.lastName} on <Moment format="MMMM D, YYYY">{this.state.currentChannel.creationDate}</Moment>.</p>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        </Accordion>
-                    </DataPanelWrap>
-                );
+            else{
+                if(this.state.showUserData) {
+                    return (
+                        <UserDataWrap>
+                            <UserDataHeader>
+                                <h2>User data</h2>
+                            </UserDataHeader>
+                            <hr />
+                            <img src={this.state.user.imgUrl} alt="avatar" height="100px"/>
+                            <br /><br />
+                            <div>
+                                <Button onClick={this.showModal}>Edit Profile</Button>
+                            </div>
+                            <hr />
+                            <div className="usrData">
+                                <p className="usrDataHeader">Full Name</p>
+                                <p>{this.state.user.firstName} {this.state.user.lastName}</p>
+                                <hr />
+                                <p className="usrDataHeader">Email</p>
+                                <p>{this.state.user.email}</p>
+                            </div>
+                            <br /><br />
+                            <Button variant="danger" onClick={this.resetUserData}>close</Button>
+    
+                            <Modal style={{ zIndex: '200px' }} show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Edit your Profile</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body style={{ textAlign: 'center' }}>
+                                    <Form>
+                                        <TextData>
+                                            <Form.Group >
+                                                <Form.Label>First name</Form.Label>
+                                                <Form.Control type="text" name="firstName" onChange={this.inputChangedHandler} placeholder="Enter your first name" value={this.state.user.firstName} />
+                                            </Form.Group>
+                                            <Form.Group >
+                                                <Form.Label>Last name</Form.Label>
+                                                <Form.Control type="text" name="lastName" onChange={this.inputChangedHandler} placeholder="Enter your last name" value={this.state.user.lastName} />
+                                            </Form.Group>
+                                            <Form.Group >
+                                                <Form.Label>Username</Form.Label>
+                                                <Form.Control type="text" name="username" onChange={this.inputChangedHandler} placeholder="Enter username" value={this.state.user.username} />
+                                            </Form.Group>
+                                            <Form.Group >
+                                                <Form.Label>Email</Form.Label>
+                                                <Form.Control type="text" name="email" onChange={this.inputChangedHandler} placeholder="Enter your email" value={this.state.user.email} />
+                                            </Form.Group>
+                                        </TextData>
+                                        <ImageData>
+                                            <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px"/> <br /><br />
+                                            <input type="file" onChange={this.handleImageChange}/>
+                                        </ImageData>
+                                        <div style={{clear: 'both'}}></div>
+                                    </Form>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="primary" onClick={() => this.updateUser()}>Save</Button>
+                                    <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
+                                </Modal.Footer>
+                            </Modal>
+                        </UserDataWrap>
+                    )
+                }
+                else {
+                    return (
+                        <DataPanelWrap>
+                            <DataPanelHeader>
+                                <h2>About this channel</h2>
+                            </DataPanelHeader>
+                            <Accordion>
+                                <Card>
+                                    <Accordion.Toggle as={Card.Header} eventKey="0" onClick={this.toggleAccordion}>
+                                        <span><i className="fa fa-info-circle"></i> Channel Details </span><i style={{ paddingLeft: '56%' }} className={this.state.accordionOpen ? "fa fa-chevron-down" : "fa fa-chevron-right"}></i>
+                                    </Accordion.Toggle>
+                                    <Accordion.Collapse eventKey="0">
+                                        <Card.Body>
+                                            <p className="channelDetailsHeader">Channel name</p>
+                                            <p>{this.state.currentChannel.channelName}</p>
+                                            <hr />
+                                            <p className="channelDetailsHeader">Channel description</p>
+                                            <p>{this.state.currentChannel.channelDescription}</p>
+                                            <hr />
+                                            <p className="channelDetailsHeader">Created</p>
+                                            <p>Created by {this.state.currentChannel.createdBy.firstName} {this.state.currentChannel.createdBy.lastName} on <Moment format="MMMM D, YYYY">{this.state.currentChannel.creationDate}</Moment>.</p>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
+                        </DataPanelWrap>
+                    );
+                }
+    
             }
-
-        }
+            }
+            
         else {
             return (
                 <div>
                     <Spinner />
-                    <h1>Loading messages...</h1>
+                    <h1>Loading data...</h1>
                 </div>
             );
         }
@@ -254,10 +264,4 @@ class DataPanel extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        channel: state.channel.currentChannel
-    }
-}
-
-export default connect(mapStateToProps, null)(DataPanel);
+export default DataPanel;

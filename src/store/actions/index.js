@@ -1,3 +1,3 @@
 export {
-    auth, logout, setCurrentChannel
+    auth, logout, setCurrentChannel, setPrivateChannel
 } from './auth'

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axiosChannels from '../../../../axios-channels';
 import { connect } from 'react-redux';
-import { setCurrentChannel } from '../../../../store/actions';
+import { setCurrentChannel, setPrivateChannel } from '../../../../store/actions';
 
 const ChannelsWrap = styled.div`
     padding: 5%;
@@ -125,6 +125,7 @@ class Channels extends Component {
     changeChannel = (channel) => {
         this.setActiveChannel(channel);
         this.props.setCurrentChannel(channel);
+        this.props.setPrivateChannel(false);
     }
 
     inputChangedHandler = (event) => {
@@ -183,4 +184,4 @@ class Channels extends Component {
     }
 }
 
-export default connect(null, { setCurrentChannel })(Channels);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(Channels);

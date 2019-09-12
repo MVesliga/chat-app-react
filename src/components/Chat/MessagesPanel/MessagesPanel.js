@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import Spinner from '../../Spinner/Spinner';
 import axiosMessages from '../../../axios-messages';
 import Message from './Message/Message';
+import PrivateMessage from './Message/PrivateMessage';
 
 const MessagesPanelWrap = styled.div`
     height: 100vh;
@@ -30,6 +31,7 @@ class MessagesPanel extends Component {
         currentChannelId: undefined,
         user: this.props.user,
         messages: [],
+        privateMessages: [],
         isLoaded: false,
         searchString: '',
         searchResult: []
@@ -51,6 +53,7 @@ class MessagesPanel extends Component {
 
     addMessage = (message) => {
         if(this.props.isPrivateChannel){
+            //console.log(message);
             stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message));
         }
         else {
@@ -83,8 +86,15 @@ class MessagesPanel extends Component {
         }
 
         if(this.props.isPrivateChannel){
-            axiosMessages.get("/privateMessages/findAll/" + this.state.user.username + "/" + this.props.channel.channelName, {headers: headers}).then(response => {
-                this.setState({messages: response.data});
+            // axiosMessages.get("/privateMessages/findAll/" + this.state.user.username + "/" + this.props.channel.channelName, {headers: headers}).then(response => {
+            //     this.setState({messages: response.data});
+            // })
+            // .catch(error => {
+            //     console.log(error);
+            // });
+
+            axiosMessages.get("/privateMessages/findAll", {headers: headers}).then(response => {
+                this.setState({privateMessages: response.data});
             })
             .catch(error => {
                 console.log(error);
@@ -92,7 +102,7 @@ class MessagesPanel extends Component {
         }
         else{
             axiosMessages.get("/messages/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
-                this.setState({ messages: response.data });
+                this.setState({ messages: response.data });   
             }).catch(error => {
                 console.log(error);
             });
@@ -101,9 +111,16 @@ class MessagesPanel extends Component {
 
     componentWillReceiveProps(nextProps){
         if(nextProps.newMessage !== undefined){
-            this.setState(oldState => ({
-                messages: [...oldState.messages, nextProps.newMessage]
-            }));
+            if(nextProps.isPrivateChannel){
+                this.setState(oldState => ({
+                    privateMessages: [...oldState.privateMessages, nextProps.newMessage]
+                }));
+            }
+            else{
+                this.setState(oldState => ({
+                    messages: [...oldState.messages, nextProps.newMessage]
+                }));
+            }
         }
 
         this.props.resetMsg(true);
@@ -126,7 +143,8 @@ class MessagesPanel extends Component {
         if(messages.length > 0){
             if(this.props.isPrivateChannel){
                 returnMessage = messages.map((message, i) => {
-                    return (message.from === this.state.user.username && message.to === this.props.channel.channelName) ? <p>{message.messageContent}</p> : null
+                    return ((message.fromUser.username === this.state.user.username && message.toUser.username === this.props.channel.user.username) || 
+                    (message.fromUser.username === this.props.channel.user.username && message.toUser.username === this.state.user.username)) ? <PrivateMessage key={message.id} message={message} user={this.state.user}/> : null
                 });
             }
             else{
@@ -140,13 +158,13 @@ class MessagesPanel extends Component {
         return returnMessage;
     }
     render() {
-        const { messages, searchResult } = this.state;
+        const { messages, privateMessages, searchResult } = this.state;
         if (this.props.channel) {
             return (
                 <MessagesPanelWrap>
                     <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} searchMessages={this.searchMessages}/>
                     <MessagesWrap>
-                        {this.state.searchString ? this.displayMessages(searchResult) : this.displayMessages(messages)}
+                        {this.state.searchString ? this.displayMessages(searchResult) : this.props.isPrivateChannel ? this.displayMessages(privateMessages) : this.displayMessages(messages)}
                     </MessagesWrap>
                     <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} isPrivateChannel={this.props.isPrivateChannel}/>
                 </MessagesPanelWrap>

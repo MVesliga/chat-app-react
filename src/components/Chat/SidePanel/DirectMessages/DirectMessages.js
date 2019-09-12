@@ -56,7 +56,8 @@ class DirectMessages extends Component {
 
         const channelData = {
             id: userMessageChannelId,
-            channelName: user.username
+            channelName: user.username,
+            user: user
         }
 
         this.props.setCurrentChannel(channelData);

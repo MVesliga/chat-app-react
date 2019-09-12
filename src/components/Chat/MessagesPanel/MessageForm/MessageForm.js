@@ -61,8 +61,8 @@ class MessageForm extends Component {
         else {
             if (this.props.isPrivateChannel) {
                 const privateMessage = {
-                    from: this.props.user.username,
-                    to: this.props.channel.channelName,
+                    fromUser: this.props.user,
+                    toUser: this.props.channel.user,
                     messageContent: this.state.messageContent
                 }
 

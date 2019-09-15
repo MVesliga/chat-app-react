@@ -45,7 +45,10 @@ class MessageForm extends Component {
     state = {
         messageContent: '',
         messageEmptyError: false,
-        showModal: false
+        showModal: false,
+        imageUploaded: false,
+        imageUrl: '',
+        imageUploadError: ''
     }
 
     inputChangedHandler = (event) => {
@@ -53,35 +56,59 @@ class MessageForm extends Component {
     };
 
     sendMessage = (event) => {
-        event.preventDefault();
-
-        if (this.state.messageContent.length === 0) {
-            this.setState({ messageEmptyError: true });
+        if(!this.state.showModal){
+            event.preventDefault();
         }
-        else {
-            if (this.props.isPrivateChannel) {
-                const privateMessage = {
-                    fromUser: this.props.user,
-                    toUser: this.props.channel.user,
-                    messageContent: this.state.messageContent
-                }
-
-                this.props.messageToAdd(privateMessage);
-            }
-            else {
+        else{
+            if(!this.state.imageUploaded){
+                this.setState({imageUploadError: 'Please select a image you want to send!'});
+            }else{
                 const message = {
                     channelId: this.props.channel.id,
+                    image: this.state.imageUploaded,
+                    imageUrl: this.state.imageUrl,
                     messageContent: this.state.messageContent,
                     user: this.props.user
                 }
 
+                this.setState({imageUploadError: ''});
+                
                 //console.log(message);
                 this.props.messageToAdd(message);
-
-            }
-
-            this.setState(initialState);
+            }   
+            
         }
+        
+
+        // if (this.state.messageContent.length === 0) {
+        //     this.setState({ messageEmptyError: true });
+        // }
+        // else {
+        //     if (this.props.isPrivateChannel) {
+        //         const privateMessage = {
+        //             fromUser: this.props.user,
+        //             toUser: this.props.channel.user,
+        //             messageContent: this.state.messageContent
+        //         }
+
+        //         this.props.messageToAdd(privateMessage);
+        //     }
+        //     else {
+                // const message = {
+                //     channelId: this.props.channel.id,
+                //     isImage: this.state.imageUploaded,
+                //     imageUrl: this.state.imageUrl,
+                //     messageContent: this.state.messageContent,
+                //     user: this.props.user
+                // }
+
+                // console.log(message);
+        //         this.props.messageToAdd(message);
+
+        //     }
+
+        //     this.setState(initialState);
+        // }
 
     }
 
@@ -93,8 +120,19 @@ class MessageForm extends Component {
         this.setState({ showModal: false });
     }
 
-    fileSelectedHandler = event => {
-        console.log(event.target.files[0]);
+    handleImageChange = (event) => {
+        const image = event.target.files[0];
+        const reader = new FileReader();
+
+        if (image) {
+            reader.readAsDataURL(image);
+            reader.addEventListener('load', () => {
+                this.setState({
+                    imageUploaded: true,
+                    imageUrl: reader.result
+                });
+            })
+        }
     }
 
     render() {
@@ -128,11 +166,12 @@ class MessageForm extends Component {
                         <Modal.Body>
                             <Form.Group >
                                 <Form.Label><b>Select file</b></Form.Label>
-                                <Form.Control type="file" onChange={this.fileSelectedHandler} />
+                                <Form.Control type="file" onChange={this.handleImageChange} />
+                                <p style={{color: 'red'}}>{this.state.imageUploadError ? this.state.imageUploadError : null}</p>
                             </Form.Group>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="primary" onClick={() => this.closeModal()}>Save</Button>
+                            <Button variant="primary" onClick={() => this.sendMessage()}>Save</Button>
                             <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
                         </Modal.Footer>
                     </Modal>

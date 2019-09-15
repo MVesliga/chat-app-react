@@ -52,28 +52,36 @@ class MessagesPanel extends Component {
     }
 
     addMessage = (message) => {
-        if(this.props.isPrivateChannel){
+        if (this.props.isPrivateChannel) {
             //console.log(message);
-            stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message));
+            stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message).readAsArrayBuffer());
         }
         else {
-            stompClient.send("/app/chat.sendMessage",  {}, JSON.stringify(message));
+            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
         }
-        
+
     }
-    
+
     searchMessages = (searchString) => {
-        this.setState({searchString: searchString});
-        
-        const messages = [...this.state.messages];
+        this.setState({ searchString: searchString });
+        let searchResult;
+        if (this.props.isPrivateChannel) {
+            const privateMessages = [...this.state.privateMessages];
 
-        const searchResult = messages.filter(message => {
-            return message.messageContent.match(searchString);
-        });
-        
-        this.setState({searchResult: searchResult});
+            searchResult = privateMessages.filter(privateMessage => {
+                return privateMessage.messageContent.match(searchString);
+            });
+        }
+        else {
+            const messages = [...this.state.messages];
 
-        console.log(this.state.searchResult);
+            searchResult = messages.filter(message => {
+                return message.messageContent.match(searchString);
+            });
+        }
+
+
+        this.setState({ searchResult: searchResult });
     }
 
     setChannelId(id) {
@@ -85,7 +93,7 @@ class MessagesPanel extends Component {
             "Authorization": `Bearer ${this.props.token}`
         }
 
-        if(this.props.isPrivateChannel){
+        if (this.props.isPrivateChannel) {
             // axiosMessages.get("/privateMessages/findAll/" + this.state.user.username + "/" + this.props.channel.channelName, {headers: headers}).then(response => {
             //     this.setState({messages: response.data});
             // })
@@ -93,30 +101,30 @@ class MessagesPanel extends Component {
             //     console.log(error);
             // });
 
-            axiosMessages.get("/privateMessages/findAll", {headers: headers}).then(response => {
-                this.setState({privateMessages: response.data});
+            axiosMessages.get("/privateMessages/findAll", { headers: headers }).then(response => {
+                this.setState({ privateMessages: response.data });
             })
-            .catch(error => {
-                console.log(error);
-            });
+                .catch(error => {
+                    console.log(error);
+                });
         }
-        else{
+        else {
             axiosMessages.get("/messages/findAll/" + this.state.currentChannelId, { headers: headers }).then(response => {
-                this.setState({ messages: response.data });   
+                this.setState({ messages: response.data });
             }).catch(error => {
                 console.log(error);
             });
         }
-    }   
+    }
 
-    componentWillReceiveProps(nextProps){
-        if(nextProps.newMessage !== undefined){
-            if(nextProps.isPrivateChannel){
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.newMessage !== undefined) {
+            if (nextProps.isPrivateChannel) {
                 this.setState(oldState => ({
                     privateMessages: [...oldState.privateMessages, nextProps.newMessage]
                 }));
             }
-            else{
+            else {
                 this.setState(oldState => ({
                     messages: [...oldState.messages, nextProps.newMessage]
                 }));
@@ -124,35 +132,35 @@ class MessagesPanel extends Component {
         }
 
         this.props.resetMsg(true);
-    } 
+    }
 
-    componentDidMount(){        
+    componentDidMount() {
         stompClient = this.props.stompClient;
     }
 
     componentDidUpdate(prevProps, prevState) {
         //console.log(this.props);
         if (prevState.currentChannelId !== this.state.currentChannelId) {
-                this.axiosFunction();
+            this.axiosFunction();
         }
     }
 
     displayMessages = (messages) => {
         let returnMessage;
-        
-        if(messages.length > 0){
-            if(this.props.isPrivateChannel){
+
+        if (messages.length > 0) {
+            if (this.props.isPrivateChannel) {
                 returnMessage = messages.map((message, i) => {
-                    return ((message.fromUser.username === this.state.user.username && message.toUser.username === this.props.channel.user.username) || 
-                    (message.fromUser.username === this.props.channel.user.username && message.toUser.username === this.state.user.username)) ? <PrivateMessage key={message.id} message={message} user={this.state.user}/> : null
+                    return ((message.fromUser.username === this.state.user.username && message.toUser.username === this.props.channel.user.username) ||
+                        (message.fromUser.username === this.props.channel.user.username && message.toUser.username === this.state.user.username)) ? <PrivateMessage key={message.id} message={message} user={this.state.user} /> : null
                 });
             }
-            else{
-                returnMessage = messages.map((message,i) => {
+            else {
+                returnMessage = messages.map((message, i) => {
                     return (message.channelId === this.state.currentChannelId) ? <Message key={message.id} message={message} user={this.state.user} /> : null
                 });
             }
-            
+
         }
 
         return returnMessage;
@@ -162,11 +170,11 @@ class MessagesPanel extends Component {
         if (this.props.channel) {
             return (
                 <MessagesPanelWrap>
-                    <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} searchMessages={this.searchMessages}/>
+                    <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} searchMessages={this.searchMessages} />
                     <MessagesWrap>
                         {this.state.searchString ? this.displayMessages(searchResult) : this.props.isPrivateChannel ? this.displayMessages(privateMessages) : this.displayMessages(messages)}
                     </MessagesWrap>
-                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} isPrivateChannel={this.props.isPrivateChannel}/>
+                    <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} isPrivateChannel={this.props.isPrivateChannel} />
                 </MessagesPanelWrap>
             );
         }

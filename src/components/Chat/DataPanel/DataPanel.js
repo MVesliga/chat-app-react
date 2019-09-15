@@ -42,6 +42,21 @@ const UserDataWrap = styled.div`
         font-weight: bold;
         color:  #a6a6a6;
     }
+
+    .usrImg{
+        width: 15%;
+        float: left;
+        margin-top: 5%;
+        border-radius: 50%;
+    }
+
+    .usrDetails{
+        width: 80%;
+        float: left;
+        text-align: left;
+        margin-top: 4%;
+        padding-left: 10px;
+    }
 `
 
 const UserDataHeader = styled.div`
@@ -82,7 +97,7 @@ class DataPanel extends Component {
         //console.log(nextProps);
         this.setState({ currentChannel: nextProps.channel });
         this.setState({ showUserData: nextProps.showUserData });
-        this.setState({isPrivateChannel: nextProps.isPrivateChannel});
+        this.setState({ isPrivateChannel: nextProps.isPrivateChannel });
     }
 
     toggleAccordion = () => {
@@ -111,19 +126,20 @@ class DataPanel extends Component {
     inputChangedHandler = (event) => {
         let userCopy = this.state.user;
         userCopy[event.target.name] = event.target.value;
-        this.setState({user: userCopy});
+        this.setState({ user: userCopy });
     };
 
     handleImageChange = (event) => {
         const image = event.target.files[0];
         const reader = new FileReader();
 
-        if(image){
+        if (image) {
             reader.readAsDataURL(image);
             reader.addEventListener('load', () => {
                 this.setState({
-                    imageUploaded: true, 
-                    newImage: reader.result});
+                    imageUploaded: true,
+                    newImage: reader.result
+                });
             })
         }
         // this.setState({
@@ -135,37 +151,54 @@ class DataPanel extends Component {
 
     updateUser = () => {
         let updatedUser = this.state.user;
-        if(this.state.imageUploaded){
+        if (this.state.imageUploaded) {
             updatedUser.imgUrl = this.state.newImage;
         }
 
         const headers = {
             "Authorization": `Bearer ${this.props.token}`
         }
-        axiosUsers.put("/updateUser", updatedUser, {headers: headers}).then(response => {
+        axiosUsers.put("/updateUser", updatedUser, { headers: headers }).then(response => {
             console.log(response);
         })
-        .catch(error => {
-            console.log(error);
-        })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     render() {
         if (this.state.currentChannel) {
-            if(this.state.isPrivateChannel){
+            if (this.state.isPrivateChannel) {
                 return (
-                    <h1>private channel</h1>
+                    <UserDataWrap>
+                        <UserDataHeader>
+                            <h2>About this user</h2>
+                        </UserDataHeader>
+                        <hr />
+                        <img src={this.state.currentChannel.user.imgUrl} alt="userImage" />
+                        <br /><br />
+                        <hr />
+                        <div className="usrData">
+                            <p className="usrDataHeader">Full Name</p>
+                            <p>{this.state.currentChannel.user.firstName} {this.state.currentChannel.user.lastName}</p>
+                            <hr />
+                            <p className="usrDataHeader">Email</p>
+                            <p>{this.state.currentChannel.user.email}</p>
+                        </div>
+                    </UserDataWrap>
+
+
                 )
             }
-            else{
-                if(this.state.showUserData) {
+            else {
+                if (this.state.showUserData) {
                     return (
                         <UserDataWrap>
                             <UserDataHeader>
                                 <h2>User data</h2>
                             </UserDataHeader>
                             <hr />
-                            <img src={this.state.user.imgUrl} alt="avatar" height="100px"/>
+                            <img src={this.state.user.imgUrl} alt="avatar" height="100px" />
                             <br /><br />
                             <div>
                                 <Button onClick={this.showModal}>Edit Profile</Button>
@@ -180,7 +213,7 @@ class DataPanel extends Component {
                             </div>
                             <br /><br />
                             <Button variant="danger" onClick={this.resetUserData}>close</Button>
-    
+
                             <Modal style={{ zIndex: '200px' }} show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Edit your Profile</Modal.Title>
@@ -206,10 +239,10 @@ class DataPanel extends Component {
                                             </Form.Group>
                                         </TextData>
                                         <ImageData>
-                                            <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px"/> <br /><br />
-                                            <input type="file" onChange={this.handleImageChange}/>
+                                            <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px" /> <br /><br />
+                                            <input type="file" onChange={this.handleImageChange} />
                                         </ImageData>
-                                        <div style={{clear: 'both'}}></div>
+                                        <div style={{ clear: 'both' }}></div>
                                     </Form>
                                 </Modal.Body>
                                 <Modal.Footer>
@@ -248,10 +281,10 @@ class DataPanel extends Component {
                         </DataPanelWrap>
                     );
                 }
-    
+
             }
-            }
-            
+        }
+
         else {
             return (
                 <div>

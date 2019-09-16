@@ -59,16 +59,28 @@ class MessageForm extends Component {
     sendImage = () => {
         if(this.state.imageUrl !== ''){
             if(this.isValidURL(this.state.imageUrl)){
-                const message = {
-                    channelId: this.props.channel.id,
-                    isImage: true,
-                    imageUrl: this.state.imageUrl,
-                    messageContent: this.state.messageContent,
-                    user: this.props.user
+                if(this.props.isPrivateChannel){
+                    const privateMessage = {
+                        fromUser: this.props.user,
+                        toUser: this.props.channel.user,
+                        imageUrl: this.state.imageUrl,
+                        messageContent: this.state.messageContent
+                    }
+    
+                    this.props.messageToAdd(privateMessage);
+                }
+                else{
+                    const message = {
+                        channelId: this.props.channel.id,
+                        imageUrl: this.state.imageUrl,
+                        messageContent: this.state.messageContent,
+                        user: this.props.user
+                    }
+                    
+                    //console.log(message);
+                    this.props.messageToAdd(message);
                 }
                 
-                //console.log(message);
-                this.props.messageToAdd(message);
 
                 this.setState(initialState)
             }
@@ -92,6 +104,7 @@ class MessageForm extends Component {
                     const privateMessage = {
                         fromUser: this.props.user,
                         toUser: this.props.channel.user,
+                        imageUrl: this.state.imageUrl,
                         messageContent: this.state.messageContent
                     }
     
@@ -100,7 +113,6 @@ class MessageForm extends Component {
                 else {
                     const message = {
                         channelId: this.props.channel.id,
-                        isImage: false,
                         imageUrl: this.state.imageUrl,
                         messageContent: this.state.messageContent,
                         user: this.props.user
@@ -145,7 +157,7 @@ class MessageForm extends Component {
                                     <Button type="submit" className="sendBtn">Send</Button>
                                 </Col>
                                 <Col lg="6">
-                                    <Button variant="info" onClick={() => this.showModal()}>Upload picture</Button>
+                                    <Button variant="info" onClick={() => this.showModal()}>Send image</Button>
                                 </Col>
                             </Row>
                         </Form.Group>

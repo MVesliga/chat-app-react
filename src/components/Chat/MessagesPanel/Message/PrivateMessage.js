@@ -45,7 +45,9 @@ const Message = (props) => (
             <img className="usrImg" src={props.message.fromUser.username === props.user.username ? props.message.fromUser.imgUrl : props.message.fromUser.imgUrl} alt="userImage" height="50px;" />
             <div className="msgDetails">
                 <span><a href="#">{props.message.fromUser.username === props.user.username ? props.message.fromUser.username : props.message.fromUser.username}</a> <Moment style={{ fontSize: '12px' }} fromNow>{props.message.timestamp}</Moment></span>
-                <p>{props.message.messageContent}</p>
+                <br />
+                {props.message.imageUrl ? <img src={props.message.imageUrl} alt="imageMessage" width="80%"/> : null}
+                <p>{!props.message.image ? props.message.messageContent : ''}</p>
             </div>
             <div style={{ clear: 'both' }}></div>
         </MessageWrap>

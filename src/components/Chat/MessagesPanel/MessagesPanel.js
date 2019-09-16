@@ -54,7 +54,7 @@ class MessagesPanel extends Component {
     addMessage = (message) => {
         if (this.props.isPrivateChannel) {
             //console.log(message);
-            stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message).readAsArrayBuffer());
+            stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message));
         }
         else {
             if(message.image){

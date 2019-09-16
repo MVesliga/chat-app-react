@@ -57,7 +57,24 @@ class MessagesPanel extends Component {
             stompClient.send("/app/chat.sendPrivateMessage", {}, JSON.stringify(message).readAsArrayBuffer());
         }
         else {
-            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
+            if(message.image){
+                console.log(message);
+
+                const headers = {
+                    "Authorization": `Bearer ${this.props.token}`
+                }
+
+                axiosMessages.post("/messages/image", message, {headers: headers}).then(response => {
+                    //this.setState({messages: [...this.state.messages, message]});
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+            }
+            else{
+                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(message));
+            } 
         }
 
     }

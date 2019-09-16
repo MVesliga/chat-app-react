@@ -37,7 +37,9 @@ const MessageFormWrap = styled.div`
 const initialState = {
     messageContent: '',
     messageEmptyError: false,
-    showModal: false
+    showModal: false,
+    imageUrl: '',
+    imageUploadError: ''
 }
 
 class MessageForm extends Component {
@@ -46,7 +48,6 @@ class MessageForm extends Component {
         messageContent: '',
         messageEmptyError: false,
         showModal: false,
-        imageUploaded: false,
         imageUrl: '',
         imageUploadError: ''
     }
@@ -55,61 +56,62 @@ class MessageForm extends Component {
         this.setState({ [event.target.name]: event.target.value });
     };
 
-    sendMessage = (event) => {
-        if(!this.state.showModal){
-            event.preventDefault();
-        }
-        else{
-            if(!this.state.imageUploaded){
-                this.setState({imageUploadError: 'Please select a image you want to send!'});
-            }else{
+    sendImage = () => {
+        if(this.state.imageUrl !== ''){
+            if(this.isValidURL(this.state.imageUrl)){
                 const message = {
                     channelId: this.props.channel.id,
-                    image: this.state.imageUploaded,
+                    isImage: true,
                     imageUrl: this.state.imageUrl,
                     messageContent: this.state.messageContent,
                     user: this.props.user
                 }
-
-                this.setState({imageUploadError: ''});
                 
                 //console.log(message);
                 this.props.messageToAdd(message);
-            }   
-            
+
+                this.setState(initialState)
+            }
+            else{
+                this.setState({imageUploadError: 'Please put in a valid image url!'});
+            }
         }
-        
+        else{
+            this.setState({imageUploadError: 'Please put in the image url you want to send!'});
+        }
+    }
 
-        // if (this.state.messageContent.length === 0) {
-        //     this.setState({ messageEmptyError: true });
-        // }
-        // else {
-        //     if (this.props.isPrivateChannel) {
-        //         const privateMessage = {
-        //             fromUser: this.props.user,
-        //             toUser: this.props.channel.user,
-        //             messageContent: this.state.messageContent
-        //         }
+    sendMessage = (event) => {
+        event.preventDefault();
 
-        //         this.props.messageToAdd(privateMessage);
-        //     }
-        //     else {
-                // const message = {
-                //     channelId: this.props.channel.id,
-                //     isImage: this.state.imageUploaded,
-                //     imageUrl: this.state.imageUrl,
-                //     messageContent: this.state.messageContent,
-                //     user: this.props.user
-                // }
-
-                // console.log(message);
-        //         this.props.messageToAdd(message);
-
-        //     }
-
-        //     this.setState(initialState);
-        // }
-
+            if (this.state.messageContent.length === 0) {
+                this.setState({ messageEmptyError: true });
+            }
+            else {
+                if (this.props.isPrivateChannel) {
+                    const privateMessage = {
+                        fromUser: this.props.user,
+                        toUser: this.props.channel.user,
+                        messageContent: this.state.messageContent
+                    }
+    
+                    this.props.messageToAdd(privateMessage);
+                }
+                else {
+                    const message = {
+                        channelId: this.props.channel.id,
+                        isImage: false,
+                        imageUrl: this.state.imageUrl,
+                        messageContent: this.state.messageContent,
+                        user: this.props.user
+                    }
+    
+                    this.props.messageToAdd(message);
+    
+                }
+    
+                this.setState(initialState);
+            }
     }
 
     showModal() {
@@ -120,23 +122,13 @@ class MessageForm extends Component {
         this.setState({ showModal: false });
     }
 
-    handleImageChange = (event) => {
-        const image = event.target.files[0];
-        const reader = new FileReader();
-
-        if (image) {
-            reader.readAsDataURL(image);
-            reader.addEventListener('load', () => {
-                this.setState({
-                    imageUploaded: true,
-                    imageUrl: reader.result
-                });
-            })
-        }
-    }
+    isValidURL = (string) => {
+        let res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        return (res !== null)
+      };
 
     render() {
-        const { messageContent, messageEmptyError } = this.state;
+        const { messageContent, messageEmptyError, imageUrl } = this.state;
 
         return (
             <Container>
@@ -165,13 +157,13 @@ class MessageForm extends Component {
                         </Modal.Header>
                         <Modal.Body>
                             <Form.Group >
-                                <Form.Label><b>Select file</b></Form.Label>
-                                <Form.Control type="file" onChange={this.handleImageChange} />
+                                <Form.Label><b>Image url</b></Form.Label>
+                                <Form.Control type="text" name="imageUrl" autoComplete="off" placeholder="Enter image URL" onChange={this.inputChangedHandler} value={imageUrl}/>
                                 <p style={{color: 'red'}}>{this.state.imageUploadError ? this.state.imageUploadError : null}</p>
                             </Form.Group>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="primary" onClick={() => this.sendMessage()}>Save</Button>
+                            <Button variant="primary" onClick={() => this.sendImage()}>Save</Button>
                             <Button variant="danger" onClick={() => this.closeModal()}>Close</Button>
                         </Modal.Footer>
                     </Modal>

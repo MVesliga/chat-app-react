@@ -88,8 +88,6 @@ class DataPanel extends Component {
         showUserData: false,
         user: this.props.user,
         showModal: false,
-        newImage: '',
-        imageUploaded: false,
         isPrivateChannel: this.props.isPrivateChannel
     }
 
@@ -129,32 +127,9 @@ class DataPanel extends Component {
         this.setState({ user: userCopy });
     };
 
-    handleImageChange = (event) => {
-        const image = event.target.files[0];
-        const reader = new FileReader();
-
-        if (image) {
-            reader.readAsDataURL(image);
-            reader.addEventListener('load', () => {
-                this.setState({
-                    imageUploaded: true,
-                    newImage: reader.result
-                });
-            })
-        }
-        // this.setState({
-        //     imageUploaded: true,
-        //     ///newImage: URL.createObjectURL(event.target.files[0])
-        //     newImage: event.target.files[0]
-        // });
-    }
-
     updateUser = () => {
         let updatedUser = this.state.user;
-        if (this.state.imageUploaded) {
-            updatedUser.imgUrl = this.state.newImage;
-        }
-
+    
         const headers = {
             "Authorization": `Bearer ${this.props.token}`
         }
@@ -198,7 +173,6 @@ class DataPanel extends Component {
                                 </Modal.Header>
                                 <Modal.Body style={{ textAlign: 'center' }}>
                                     <Form>
-                                        <TextData>
                                             <Form.Group >
                                                 <Form.Label>First name</Form.Label>
                                                 <Form.Control type="text" name="firstName" onChange={this.inputChangedHandler} placeholder="Enter your first name" value={this.state.user.firstName} />
@@ -215,12 +189,6 @@ class DataPanel extends Component {
                                                 <Form.Label>Email</Form.Label>
                                                 <Form.Control type="text" name="email" onChange={this.inputChangedHandler} placeholder="Enter your email" value={this.state.user.email} />
                                             </Form.Group>
-                                        </TextData>
-                                        <ImageData>
-                                            <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px" /> <br /><br />
-                                            <input type="file" onChange={this.handleImageChange} />
-                                        </ImageData>
-                                        <div style={{ clear: 'both' }}></div>
                                     </Form>
                                 </Modal.Body>
                                 <Modal.Footer>
@@ -281,7 +249,6 @@ class DataPanel extends Component {
                                 </Modal.Header>
                                 <Modal.Body style={{ textAlign: 'center' }}>
                                     <Form>
-                                        <TextData>
                                             <Form.Group >
                                                 <Form.Label>First name</Form.Label>
                                                 <Form.Control type="text" name="firstName" onChange={this.inputChangedHandler} placeholder="Enter your first name" value={this.state.user.firstName} />
@@ -298,12 +265,6 @@ class DataPanel extends Component {
                                                 <Form.Label>Email</Form.Label>
                                                 <Form.Control type="text" name="email" onChange={this.inputChangedHandler} placeholder="Enter your email" value={this.state.user.email} />
                                             </Form.Group>
-                                        </TextData>
-                                        <ImageData>
-                                            <img src={this.state.imageUploaded ? this.state.newImage : this.state.user.imgUrl} alt="avatar" height="100px" /> <br /><br />
-                                            <input type="file" onChange={this.handleImageChange} />
-                                        </ImageData>
-                                        <div style={{ clear: 'both' }}></div>
                                     </Form>
                                 </Modal.Body>
                                 <Modal.Footer>

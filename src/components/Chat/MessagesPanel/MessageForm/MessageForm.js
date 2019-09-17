@@ -2,6 +2,8 @@ import React, { Component, Fragment } from 'react';
 import styled from 'styled-components';
 import { Form, Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import axiosMessages from '../../../../axios-messages';
+import { Picker } from 'emoji-mart';
+import 'emoji-mart/css/emoji-mart.css'
 
 const MessageFormWrap = styled.div`
     width: 60%;
@@ -32,6 +34,12 @@ const MessageFormWrap = styled.div`
         background-color: #ff7733;
         border-color: #ff9966;
     }
+
+    .emojiPicker{
+        position: absolute;
+        top: -376px;
+        right: -360px;
+    }
 `;
 
 const initialState = {
@@ -39,7 +47,8 @@ const initialState = {
     messageEmptyError: false,
     showModal: false,
     imageUrl: '',
-    imageUploadError: ''
+    imageUploadError: '',
+    showEmojiPicker: false
 }
 
 class MessageForm extends Component {
@@ -49,7 +58,8 @@ class MessageForm extends Component {
         messageEmptyError: false,
         showModal: false,
         imageUrl: '',
-        imageUploadError: ''
+        imageUploadError: '',
+        showEmojiPicker: false
     }
 
     inputChangedHandler = (event) => {
@@ -57,49 +67,8 @@ class MessageForm extends Component {
     };
 
     sendImage = () => {
-        if(this.state.imageUrl !== ''){
-            if(this.isValidURL(this.state.imageUrl)){
-                if(this.props.isPrivateChannel){
-                    const privateMessage = {
-                        fromUser: this.props.user,
-                        toUser: this.props.channel.user,
-                        imageUrl: this.state.imageUrl,
-                        messageContent: this.state.messageContent
-                    }
-    
-                    this.props.messageToAdd(privateMessage);
-                }
-                else{
-                    const message = {
-                        channelId: this.props.channel.id,
-                        imageUrl: this.state.imageUrl,
-                        messageContent: this.state.messageContent,
-                        user: this.props.user
-                    }
-                    
-                    //console.log(message);
-                    this.props.messageToAdd(message);
-                }
-                
-
-                this.setState(initialState)
-            }
-            else{
-                this.setState({imageUploadError: 'Please put in a valid image url!'});
-            }
-        }
-        else{
-            this.setState({imageUploadError: 'Please put in the image url you want to send!'});
-        }
-    }
-
-    sendMessage = (event) => {
-        event.preventDefault();
-
-            if (this.state.messageContent.length === 0) {
-                this.setState({ messageEmptyError: true });
-            }
-            else {
+        if (this.state.imageUrl !== '') {
+            if (this.isValidURL(this.state.imageUrl)) {
                 if (this.props.isPrivateChannel) {
                     const privateMessage = {
                         fromUser: this.props.user,
@@ -107,7 +76,7 @@ class MessageForm extends Component {
                         imageUrl: this.state.imageUrl,
                         messageContent: this.state.messageContent
                     }
-    
+
                     this.props.messageToAdd(privateMessage);
                 }
                 else {
@@ -117,13 +86,60 @@ class MessageForm extends Component {
                         messageContent: this.state.messageContent,
                         user: this.props.user
                     }
-    
+
+                    //console.log(message);
                     this.props.messageToAdd(message);
-    
                 }
-    
-                this.setState(initialState);
+
+
+                this.setState(initialState)
             }
+            else {
+                this.setState({ imageUploadError: 'Please put in a valid image url!' });
+            }
+        }
+        else {
+            this.setState({ imageUploadError: 'Please put in the image url you want to send!' });
+        }
+    }
+
+    sendMessage = (event) => {
+        event.preventDefault();
+
+        if (this.state.messageContent.length === 0) {
+            this.setState({ messageEmptyError: true });
+        }
+        else {
+            if (this.props.isPrivateChannel) {
+                const privateMessage = {
+                    fromUser: this.props.user,
+                    toUser: this.props.channel.user,
+                    imageUrl: this.state.imageUrl,
+                    messageContent: this.state.messageContent
+                }
+
+                this.props.messageToAdd(privateMessage);
+            }
+            else {
+                const message = {
+                    channelId: this.props.channel.id,
+                    imageUrl: this.state.imageUrl,
+                    messageContent: this.state.messageContent,
+                    user: this.props.user
+                }
+
+                this.props.messageToAdd(message);
+
+            }
+
+            this.setState(initialState);
+        }
+    }
+
+    addEmoji = (data) => {
+        console.log(data);
+        let emoji = data.native;
+        this.setState({messageContent: this.state.messageContent + emoji});
     }
 
     showModal() {
@@ -137,7 +153,7 @@ class MessageForm extends Component {
     isValidURL = (string) => {
         let res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
         return (res !== null)
-      };
+    };
 
     render() {
         const { messageContent, messageEmptyError, imageUrl } = this.state;
@@ -148,8 +164,12 @@ class MessageForm extends Component {
                     <Form onSubmit={this.sendMessage}>
                         <Form.Group>
                             <Row>
-                                <Col lg="12">
+                                <Col lg="11">
                                     <Form.Control style={{ borderColor: messageEmptyError ? 'red' : null }} type="text" name="messageContent" autoComplete="off" placeholder="Enter message" onChange={this.inputChangedHandler} value={messageContent} />
+                                </Col>
+                                <Col lg="1">
+                                    <Button variant="secondary" onClick={() => {this.setState({showEmojiPicker: !this.state.showEmojiPicker})}}><i className="fa fa-smile-o"></i></Button>
+                                    
                                 </Col>
                             </Row>
                             <Row>
@@ -162,6 +182,9 @@ class MessageForm extends Component {
                             </Row>
                         </Form.Group>
                     </Form>
+                    <span className="emojiPicker">
+                        {this.state.showEmojiPicker ? <Picker onSelect={(data) => this.addEmoji(data)} /> : null}
+                    </span>
 
                     <Modal show={this.state.showModal} animation={true} onHide={() => this.closeModal()} size="lg" centered>
                         <Modal.Header closeButton>
@@ -170,8 +193,8 @@ class MessageForm extends Component {
                         <Modal.Body>
                             <Form.Group >
                                 <Form.Label><b>Image url</b></Form.Label>
-                                <Form.Control type="text" name="imageUrl" autoComplete="off" placeholder="Enter image URL" onChange={this.inputChangedHandler} value={imageUrl}/>
-                                <p style={{color: 'red'}}>{this.state.imageUploadError ? this.state.imageUploadError : null}</p>
+                                <Form.Control type="text" name="imageUrl" autoComplete="off" placeholder="Enter image URL" onChange={this.inputChangedHandler} value={imageUrl} />
+                                <p style={{ color: 'red' }}>{this.state.imageUploadError ? this.state.imageUploadError : null}</p>
                             </Form.Group>
                         </Modal.Body>
                         <Modal.Footer>

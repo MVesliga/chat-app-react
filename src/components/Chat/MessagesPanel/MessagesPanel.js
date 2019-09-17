@@ -153,13 +153,24 @@ class MessagesPanel extends Component {
 
     componentDidMount() {
         stompClient = this.props.stompClient;
+        if(this.messagesEnd){
+            this.scrollToBottom();
+        }
     }
+
 
     componentDidUpdate(prevProps, prevState) {
         //console.log(this.props);
         if (prevState.currentChannelId !== this.state.currentChannelId) {
             this.axiosFunction();
         }
+        if(this.messagesEnd){
+            this.scrollToBottom();
+        }
+    }
+
+    scrollToBottom = () => {
+        this.messagesEnd.scrollIntoView({behavior: 'smooth'});
     }
 
     displayMessages = (messages) => {
@@ -182,6 +193,7 @@ class MessagesPanel extends Component {
 
         return returnMessage;
     }
+
     render() {
         const { messages, privateMessages, searchResult } = this.state;
         if (this.props.channel) {
@@ -190,6 +202,7 @@ class MessagesPanel extends Component {
                     <MessagesHeader {...this.props} currentChannelId={this.getCurrentChannelId} searchMessages={this.searchMessages} />
                     <MessagesWrap>
                         {this.state.searchString ? this.displayMessages(searchResult) : this.props.isPrivateChannel ? this.displayMessages(privateMessages) : this.displayMessages(messages)}
+                        <div ref={node => (this.messagesEnd = node)} />
                     </MessagesWrap>
                     <MessageForm channel={this.props.channel} user={this.props.user} token={this.props.token} messageToAdd={this.addMessage} isPrivateChannel={this.props.isPrivateChannel} />
                 </MessagesPanelWrap>

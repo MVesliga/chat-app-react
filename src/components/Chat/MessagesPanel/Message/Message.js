@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
 import Moment from 'react-moment';
-import { Link } from 'react-router-dom';
 
 const MessageWrap = styled.div`
     width: 60%;
@@ -11,7 +10,7 @@ const MessageWrap = styled.div`
     margin-bottom: 10px;
 
     .usrImg{
-        width: 15%;
+        width: 10%;
         float: left;
         margin-top: 5%;
         border-radius: 50%;

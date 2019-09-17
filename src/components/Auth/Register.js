@@ -170,7 +170,6 @@ class Register extends Component {
             
             axiosAuth.post('/register', user).then(response => {
                 console.log(response);
-                //this.props.history.push('/login');
                 this.setState({registered: true});  
             }).catch(error => {
                 this.setState({registrationError: error.response.data});

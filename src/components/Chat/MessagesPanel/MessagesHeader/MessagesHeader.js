@@ -74,9 +74,6 @@ class MessagesHeader extends Component {
                     <Header>
                         <ChannelName>
                             <h2>{this.state.channel.channelName}</h2>
-                            <div>
-                                <span><i className="fa fa-user"></i> Number of users</span>
-                            </div>
                         </ChannelName>
                         <Search>
                             <div style={{ float: 'right' }}>

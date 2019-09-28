@@ -83,7 +83,6 @@ class Login extends Component {
     }
 
     validateForm = () => {
-
         let usernameEmptyError = '';
         let passwordEmptyError = '';
 

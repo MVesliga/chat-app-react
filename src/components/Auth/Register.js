@@ -175,8 +175,6 @@ class Register extends Component {
                 this.setState({registrationError: error.response.data});
                 console.log(error);
             });
-
-            //this.setState(initialState);
         }
     }
 

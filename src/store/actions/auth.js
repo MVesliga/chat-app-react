@@ -25,7 +25,6 @@ export const auth = (userCredentials) => {
     return dispatch => {
         dispatch(authStart());
         axiosAuth.post('/login', userCredentials).then(response => {
-            //console.log(response);
             dispatch(authSuccess(response.data));
         }).catch(error => {
             console.log(error.response.data);
